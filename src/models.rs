@@ -20,3 +20,10 @@ pub struct User {
     pub email: String,
     pub created_at: chrono::NaiveDateTime,
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = tweets)]
+pub struct NewTweet<'a> {
+    pub user_id: i32,
+    pub content: &'a str,
+}
