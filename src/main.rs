@@ -1,39 +1,42 @@
-use self::models::{NewTweet, Tweet};
-use db::establish_connection::establish_connection;
-use diesel::prelude::*;
+use actix_web::{get, post, App, HttpResponse, HttpServer, Responder};
+
+use api::add_tweet::add_tweet;
+use api::get_tweets::get_tweets;
+use api::get_tweets_by_user::get_tweets_by_user;
 
 pub mod db {
     pub mod establish_connection;
+    pub mod tweets;
+}
+pub mod api {
+    pub mod add_tweet;
+    pub mod get_tweets;
+    pub mod get_tweets_by_user;
 }
 pub mod models;
 pub mod schema;
 
-fn main() {
-    let connection = &mut establish_connection();
-
-    show_tweets(connection);
-    create_tweet(connection, 1, "contenido del tweet");
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(hello)
+            .service(echo)
+            .service(get_tweets)
+            .service(get_tweets_by_user)
+            .service(add_tweet)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
 
-fn show_tweets(conn: &mut PgConnection) {
-    use self::schema::tweets::dsl::*;
-
-    let result = tweets.load::<Tweet>(conn).expect("Error loading tweets");
-
-    println!("Displaying {} tweets", result.len());
-    for tweet in result {
-        println!("{}", tweet.content);
-    }
+#[get("/")]
+async fn hello() -> impl Responder {
+    HttpResponse::Ok().body("Hello world!")
 }
 
-fn create_tweet(conn: &mut PgConnection, user_id: i32, content: &str) -> Tweet {
-    use crate::schema::tweets;
-
-    let new_tweet = NewTweet { user_id, content };
-
-    diesel::insert_into(tweets::table)
-        .values(&new_tweet)
-        .returning(Tweet::as_returning())
-        .get_result(conn)
-        .expect("Error saving new tweet")
+#[post("/echo")]
+async fn echo(req_body: String) -> impl Responder {
+    HttpResponse::Ok().body(req_body)
 }
