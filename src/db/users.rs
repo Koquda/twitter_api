@@ -47,3 +47,13 @@ pub fn update_user(user: &User) -> Result<(), diesel::result::Error> {
 
     Ok(())
 }
+
+pub fn delete_user(user: &User) -> Result<(), diesel::result::Error> {
+    use crate::schema::users::dsl::*;
+
+    let conn = &mut establish_connection();
+
+    diesel::delete(users.filter(id.eq(&user.id))).execute(conn)?;
+
+    Ok(())
+}
