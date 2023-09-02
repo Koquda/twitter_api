@@ -1,4 +1,4 @@
-use actix_web::{get, post, App, HttpResponse, HttpServer, Responder};
+use actix_web::{App, HttpServer};
 
 use api::tweets::add_tweet::add_tweet;
 use api::tweets::delete_tweet::delete_tweet;
@@ -7,6 +7,7 @@ use api::tweets::get_tweets_by_user::get_tweets_by_user;
 use api::tweets::update_tweet::update_tweet;
 use api::users::add_user::add_user;
 use api::users::get_users::get_users;
+use api::users::update_user::update_user;
 
 pub mod db {
     pub mod establish_connection;
@@ -24,6 +25,7 @@ pub mod api {
     pub mod users {
         pub mod add_user;
         pub mod get_users;
+        pub mod update_user;
     }
 }
 pub mod models;
@@ -33,8 +35,6 @@ pub mod schema;
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .service(hello)
-            .service(echo)
             .service(get_tweets)
             .service(get_tweets_by_user)
             .service(add_tweet)
@@ -42,18 +42,9 @@ async fn main() -> std::io::Result<()> {
             .service(delete_tweet)
             .service(update_tweet)
             .service(add_user)
+            .service(update_user)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
     .await
-}
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
 }
