@@ -2,7 +2,7 @@ use crate::schema::*;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Selectable, Serialize, Deserialize)]
+#[derive(AsChangeset, Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = tweets)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Tweet {
@@ -12,7 +12,7 @@ pub struct Tweet {
     pub created_at: chrono::NaiveDateTime,
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
@@ -34,4 +34,16 @@ pub struct NewTweet<'a> {
 pub struct NewUser<'a> {
     pub username: &'a str,
     pub email: &'a str,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UpdateTweet<'a> {
+    pub id: i32,
+    pub content: &'a str,
+}
+
+impl Tweet {
+    pub fn set_content(&mut self, content: &str) {
+        self.content = content.to_string();
+    }
 }

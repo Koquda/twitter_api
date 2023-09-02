@@ -1,17 +1,28 @@
 use actix_web::{get, post, App, HttpResponse, HttpServer, Responder};
 
-use api::add_tweet::add_tweet;
-use api::get_tweets::get_tweets;
-use api::get_tweets_by_user::get_tweets_by_user;
+use api::tweets::add_tweet::add_tweet;
+use api::tweets::delete_tweet::delete_tweet;
+use api::tweets::get_tweets::get_tweets;
+use api::tweets::get_tweets_by_user::get_tweets_by_user;
+use api::tweets::update_tweet::update_tweet;
+use api::users::get_users::get_users;
 
 pub mod db {
     pub mod establish_connection;
     pub mod tweets;
+    pub mod users;
 }
 pub mod api {
-    pub mod add_tweet;
-    pub mod get_tweets;
-    pub mod get_tweets_by_user;
+    pub mod tweets {
+        pub mod add_tweet;
+        pub mod delete_tweet;
+        pub mod get_tweets;
+        pub mod get_tweets_by_user;
+        pub mod update_tweet;
+    }
+    pub mod users {
+        pub mod get_users;
+    }
 }
 pub mod models;
 pub mod schema;
@@ -25,6 +36,9 @@ async fn main() -> std::io::Result<()> {
             .service(get_tweets)
             .service(get_tweets_by_user)
             .service(add_tweet)
+            .service(get_users)
+            .service(delete_tweet)
+            .service(update_tweet)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

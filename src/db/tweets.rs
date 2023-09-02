@@ -44,3 +44,35 @@ pub fn add_tweet(
 
     Ok(())
 }
+
+pub fn get_tweet_by_id(tweet_id: &i32) -> Option<Tweet> {
+    use crate::schema::tweets::dsl::*;
+
+    let connection = &mut crate::db::establish_connection::establish_connection();
+    let result = tweets.filter(id.eq(tweet_id)).load::<Tweet>(connection);
+
+    match result {
+        Ok(mut tweets_vec) => tweets_vec.pop(),
+        Err(_) => None,
+    }
+}
+
+pub fn delete_tweet(tweet: &Tweet) -> Result<(), diesel::result::Error> {
+    use crate::schema::tweets::dsl::*;
+
+    let connection = &mut crate::db::establish_connection::establish_connection();
+    diesel::delete(tweets.filter(id.eq(tweet.id))).execute(connection)?;
+
+    Ok(())
+}
+
+pub fn update_tweet(tweet_to_update: &Tweet) -> Result<(), diesel::result::Error> {
+    use crate::schema::tweets::dsl::*;
+
+    let connection = &mut crate::db::establish_connection::establish_connection();
+    diesel::update(tweets.filter(id.eq(tweet_to_update.id)))
+        .set(tweet_to_update)
+        .execute(connection)?;
+
+    Ok(())
+}
