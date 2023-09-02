@@ -8,7 +8,8 @@ CREATE TABLE tweets (
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    username VARCHAR NOT NULL,
+    email VARCHAR NOT NULL,
+    password VARCHAR NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

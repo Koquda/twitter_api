@@ -19,6 +19,7 @@ pub struct User {
     pub id: i32,
     pub username: String,
     pub email: String,
+    pub password: String,
     pub created_at: chrono::NaiveDateTime,
 }
 
@@ -29,11 +30,12 @@ pub struct NewTweet<'a> {
     pub content: &'a str,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = users)]
 pub struct NewUser<'a> {
     pub username: &'a str,
     pub email: &'a str,
+    pub password: &'a str,
 }
 
 #[derive(Serialize, Deserialize)]
