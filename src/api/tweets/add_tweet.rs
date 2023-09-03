@@ -1,6 +1,6 @@
 use actix_web::{post, HttpResponse, Responder};
 
-use crate::{db::establish_connection::establish_connection, models::NewTweet};
+use crate::models::NewTweet;
 
 #[post("/tweets/add")]
 async fn add_tweet(req_body: String) -> impl Responder {
@@ -9,8 +9,7 @@ async fn add_tweet(req_body: String) -> impl Responder {
         Err(_) => return HttpResponse::BadRequest().finish(),
     };
 
-    let connection = &mut establish_connection();
-    match crate::db::tweets::add_tweet(connection, &tweet) {
+    match crate::db::tweets::add_tweet(&tweet) {
         Ok(_) => HttpResponse::Ok().body("Tweet added correctly"),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }

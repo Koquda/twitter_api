@@ -1,11 +1,13 @@
 use crate::{
-    db::establish_connection::establish_connection,
+    db::establish_connection::PoolWrapper,
     models::{NewUser, User},
 };
 use diesel::prelude::*;
 
-pub fn get_users(conn: &mut PgConnection) -> Vec<User> {
+pub fn get_users() -> Vec<User> {
     use crate::schema::users::dsl::*;
+
+    let conn = &mut PoolWrapper::get_instance().get().unwrap();
 
     let result = users.load::<User>(conn).expect("Error loading users");
 
@@ -15,7 +17,7 @@ pub fn get_users(conn: &mut PgConnection) -> Vec<User> {
 pub fn add_user(user: &NewUser) -> Result<(), diesel::result::Error> {
     use crate::schema::users::dsl::*;
 
-    let conn = &mut establish_connection();
+    let conn = &mut PoolWrapper::get_instance().get().unwrap();
 
     diesel::insert_into(users).values(user).execute(conn)?;
 
@@ -25,7 +27,7 @@ pub fn add_user(user: &NewUser) -> Result<(), diesel::result::Error> {
 pub fn get_user_by_id(user_id: &i32) -> Option<User> {
     use crate::schema::users::dsl::*;
 
-    let conn = &mut establish_connection();
+    let conn = &mut PoolWrapper::get_instance().get().unwrap();
 
     let result = users
         .filter(id.eq(user_id))
@@ -39,7 +41,7 @@ pub fn get_user_by_id(user_id: &i32) -> Option<User> {
 pub fn update_user(user: &User) -> Result<(), diesel::result::Error> {
     use crate::schema::users::dsl::*;
 
-    let conn = &mut establish_connection();
+    let conn = &mut PoolWrapper::get_instance().get().unwrap();
 
     diesel::update(users.filter(id.eq(&user.id)))
         .set(user)
@@ -51,7 +53,7 @@ pub fn update_user(user: &User) -> Result<(), diesel::result::Error> {
 pub fn delete_user(user: &User) -> Result<(), diesel::result::Error> {
     use crate::schema::users::dsl::*;
 
-    let conn = &mut establish_connection();
+    let conn = &mut PoolWrapper::get_instance().get().unwrap();
 
     diesel::delete(users.filter(id.eq(&user.id))).execute(conn)?;
 
